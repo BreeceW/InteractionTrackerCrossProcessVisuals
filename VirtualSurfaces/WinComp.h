@@ -82,6 +82,6 @@ private:
 	float3                      m_lastTrackerPosition{ 0.0f,0.0f,0.0f };
 	bool                        m_zooming;
 	winrt::com_ptr<IVisualTargetPartner> visualTarget;
-	RedirectVisual redirectVisual{ nullptr };
+	SpriteVisual redirectVisual{ nullptr };
 };
 
