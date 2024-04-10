@@ -89,30 +89,38 @@ void WinComp::PrepareVisuals(HANDLE handle)
 	//Create a background with Gray color brush.
 	root.Brush(m_compositor.CreateColorBrush({ 0xFF, 0xFE, 0xFE , 0xFE }));
 
-	root.Size(GetWindowSize());
 	m_target.Root(root);
 
 	auto visuals = root.Children();
 	AddD2DVisual(visuals, 0.0f, 0.0f);
 
-	redirectVisual = m_compositor.CreateRedirectVisual(root);
+	SpriteVisual redirectVisual = m_compositor.CreateSpriteVisual();
+	CompositionVisualSurface visualSurface = m_compositor.CreateVisualSurface();
+	CompositionSurfaceBrush surfaceBrush = m_compositor.CreateSurfaceBrush(visualSurface);
 
-	// Blur effect fixes issue with RedirectVisual but only if windows overlap
-	const winrt::Microsoft::Graphics::Canvas::Effects::GaussianBlurEffect blurEffect{};
-	blurEffect.Name(L"Blur");
-	blurEffect.BlurAmount(0.0f);
-	blurEffect.Source(CompositionEffectSourceParameter{ L"source" });
-	const auto blurEffectFactory{ m_compositor.CreateEffectFactory(blurEffect) };
-	const auto blurBrush{ blurEffectFactory.CreateBrush() };
-	const auto backdropBrush{ m_compositor.CreateBackdropBrush() };
-	blurBrush.SetSourceParameter(L"source", backdropBrush);
-	SpriteVisual blurSprite = m_compositor.CreateSpriteVisual();
-	blurSprite.Brush(blurBrush);
-	blurSprite.RelativeSizeAdjustment({ 1, 1 });
-	blurSprite.IsHitTestVisible(false);
-	root.Children().InsertAtTop(blurSprite);
+	visualSurface.SourceVisual(root);
+	surfaceBrush.Stretch(CompositionStretch::None);
+	redirectVisual.Brush(surfaceBrush);
 
-	visualTarget->SetRoot(reinterpret_cast<ABI::Windows::UI::Composition::IVisual *>(winrt::get_abi(redirectVisual)));
+	auto size = m_contentVisual.Size();
+	redirectVisual.Size(size);
+	visualSurface.SourceSize(size);
+
+	ExpressionAnimation sizeAnim = m_compositor.CreateExpressionAnimation(L"rootVisual.Size");
+	sizeAnim.SetReferenceParameter(L"rootVisual", m_contentVisual);
+
+	redirectVisual.StartAnimation(L"Size", sizeAnim);
+	visualSurface.StartAnimation(L"SourceSize", sizeAnim);
+
+	// Apparently it's not possible to use a SpriteVisual with a CompositionVisualSurface brush
+	// (or CompositionSurfaceBrush in general?) as VisualInteractionSource, so we create a transparent SpriteVisual
+	// with a simple CompositionColorBrush on top of it and use it as VisualInteractionSource instead.
+	this->redirectVisual = m_compositor.CreateSpriteVisual();
+	this->redirectVisual.RelativeSizeAdjustment({ 1, 1 });
+	this->redirectVisual.Brush(m_compositor.CreateColorBrush({ 0x0, 0x0, 0x0, 0x0 }));
+	redirectVisual.Children().InsertAtTop(this->redirectVisual);
+
+	visualTarget->SetRoot(reinterpret_cast<ABI::Windows::UI::Composition::IVisual*>(winrt::get_abi(redirectVisual)));
 }
 
 //
