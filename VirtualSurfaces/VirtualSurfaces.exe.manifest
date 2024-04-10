@@ -19,10 +19,4 @@
 				language="*" />
 		</dependentAssembly>
 	</dependency>
-	<file name="Microsoft.Graphics.Canvas.dll">
-		<activatableClass
-			name="Microsoft.Graphics.Canvas.Effects.GaussianBlurEffect"
-			threadingModel="both"
-			xmlns="urn:schemas-microsoft-com:winrt.v1" />
-	</file>
 </assembly>
