@@ -3,8 +3,6 @@ This demonstrates [Cross Process Visuals](https://github.com/ahmed605/Compositio
 
 ## Caveats
 * This sample uses internal APIs not meant for general public usage
-* RedirectVisual seems to have an issue where the secondary window will not update except where it overlaps the primary window
-  * This repo contains a hack/mitigation for that by applying a zero-amount blur over the entire root visual, which forces the whole window to update, but only works when the windows are at least partially overlaid
 * Touch/pen manipulation needs to be redirected to InteractionTracker. This sample does not do that for the primary window. I have not yet tested if that is possible, so touch/pen interaction only works in the secondary window. Trackpad interaction works, however.
 
 ## Demo
