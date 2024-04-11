@@ -44,6 +44,7 @@ public:
 	void UpdateViewPort(boolean changeContentVisual);
 	void ConfigureInteraction();
 	void TryRedirectForManipulation(PointerPoint pp);
+	void TryRedirectForManipulation(POINTER_INFO info);
 	void TryUpdatePositionBy(float3 const& amount);
 
 	//interaction tracker owner implementation
