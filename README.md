@@ -3,7 +3,6 @@ This demonstrates [Cross Process Visuals](https://github.com/ahmed605/Compositio
 
 ## Caveats
 * This sample uses internal APIs not meant for general public usage
-* Touch/pen manipulation needs to be redirected to InteractionTracker. This sample does not do that for the primary window. I have not yet tested if that is possible, so touch/pen interaction only works in the secondary window. Trackpad interaction works, however.
 
 ## Demo
 https://github.com/BreeceW/InteractionTrackerCrossProcessVisuals/assets/18747724/3177a0e6-f8a2-4180-afcd-9d3325e90ffc
