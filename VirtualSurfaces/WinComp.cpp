@@ -14,8 +14,7 @@
 
 #include "stdafx.h"
 #include "WinComp.h"
-
-
+#include "windows.ui.composition.interop.h"
 
 //
 //  FUNCTION: EnsureDispatcherQueue
@@ -62,6 +61,15 @@ void WinComp::TryRedirectForManipulation(PointerPoint pp)
 {
 	//Redirecting the Pointer input for manipulation by the InteractionTracker
 	m_interactionSource.TryRedirectForManipulation(pp);
+}
+
+void WinComp::TryRedirectForManipulation(POINTER_INFO info)
+{
+	namespace abi = ABI::Windows::UI::Composition::Interactions;
+
+	//Redirecting the Pointer input for manipulation by the InteractionTracker
+	com_ptr<abi::IVisualInteractionSourceInterop> sourceInterop = m_interactionSource2.as<abi::IVisualInteractionSourceInterop>();
+	sourceInterop->TryRedirectForManipulation(info);
 }
 
 void WinComp::TryUpdatePositionBy(float3 const& amount)
