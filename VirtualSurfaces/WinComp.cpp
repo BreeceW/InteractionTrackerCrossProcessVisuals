@@ -142,7 +142,7 @@ void WinComp::PrepareVisuals(HANDLE handle)
 
 				if (CreateCoreInput)
 				{
-					auto result = CreateCoreInput(CI_INDEPENDENT_INPUT, (COREINPUT_POINTER_TYPE)(CIPT_TOUCH | CIPT_PEN), NULL, winrt::guid_of<ICoreInputSourceBase>(), winrt::put_abi(source));
+					auto result = CreateCoreInput(CI_INDEPENDENT_INPUT, (COREINPUT_POINTER_TYPE)(CIPT_TOUCH | CIPT_PEN), CIF_NONE, winrt::guid_of<ICoreInputSourceBase>(), winrt::put_abi(source));
 
 					if (SUCCEEDED(result))
 					{
