@@ -160,6 +160,7 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="TileDrawingManager.h" />
     <ClInclude Include="WinComp.h" />
+    <ClInclude Include="Windows.UI.Core.Private.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DirectXTileRenderer.cpp" />
