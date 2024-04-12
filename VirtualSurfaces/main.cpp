@@ -29,15 +29,13 @@ using namespace Windows::UI::Input;
 #define CDSSHAREDHANDLE 0x123987
 
 // Global Variables:
-HINSTANCE	hInst;                               // current instance
-HANDLE receivedHandle;
-HANDLE parentProccess;
-std::wstring		szTitle;             // The title bar text
-std::wstring		szWindowClass;       // the main window class name
-HWND		m_childHWnd;
-WinComp *m_winComp;
-
-HWND secondaryHwnd;
+HINSTANCE	 hInst;               // current instance
+HANDLE       receivedHandle;
+HANDLE       parentProccess;
+std::wstring szTitle;             // The title bar text
+std::wstring szWindowClass;       // the main window class name
+HWND         m_childHWnd;
+WinComp*     m_winComp;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -205,7 +203,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         // Wait for the secondary process to spawn its window
         Sleep(500);
 
-        secondaryHwnd = FindWindowW(L"CompositionTiles.Secondary", NULL);
+        HWND secondaryHwnd = FindWindowW(L"CompositionTiles.Secondary", NULL);
         SendMessage(secondaryHwnd, WM_COPYDATA, (WPARAM)(HWND)hWndParent, (LPARAM)(LPVOID)&CDS);
 
         MSG msg;
