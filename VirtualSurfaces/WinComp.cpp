@@ -124,10 +124,11 @@ void WinComp::PrepareVisuals(HANDLE handle)
 	Windows::System::Threading::WorkItemHandler workItemHandler([this, redirectVisual](Windows::Foundation::IAsyncAction const&)
 	{
 		CoreIndependentInputSource source{ nullptr };
+		CoreIndependentInputSourceController controller{ nullptr };
 
 		if (Windows::Foundation::Metadata::ApiInformation::IsTypePresent(winrt::name_of<CoreIndependentInputSourceController>()))
 		{
-			CoreIndependentInputSourceController controller = CoreIndependentInputSourceController::CreateForVisual(redirectVisual);
+			controller = CoreIndependentInputSourceController::CreateForVisual(redirectVisual);
 			controller.SetControlledInput(CoreInputDeviceTypes::Touch | CoreInputDeviceTypes::Pen);
 			source = controller.Source();
 		}
