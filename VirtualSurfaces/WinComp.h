@@ -23,6 +23,7 @@ using namespace winrt;
 using namespace winrt::impl;
 using namespace Windows::System;
 using namespace Windows::UI;
+using namespace Windows::UI::Core;
 using namespace Windows::UI::Composition;
 using namespace Windows::UI::Composition::Interactions;
 using namespace Windows::UI::Composition::Desktop;
@@ -44,7 +45,6 @@ public:
 	void UpdateViewPort(boolean changeContentVisual);
 	void ConfigureInteraction();
 	void TryRedirectForManipulation(PointerPoint pp);
-	void TryRedirectForManipulation(POINTER_INFO info);
 	void TryUpdatePositionBy(float3 const& amount);
 
 	//interaction tracker owner implementation
@@ -60,6 +60,8 @@ private:
 	void AddD2DVisual(VisualCollection const& visuals, float x, float y);
 	void StartAnimation(CompositionSurfaceBrush brush);
 	Size GetWindowSize();
+
+	void OnRedirectVisualPointerPressed(IInspectable const& sender, PointerEventArgs const& args);
 
 	//member variables
 	Compositor                  m_compositor{ nullptr };

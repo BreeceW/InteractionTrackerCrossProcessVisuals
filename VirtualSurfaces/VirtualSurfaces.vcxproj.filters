@@ -39,6 +39,9 @@
     <ClInclude Include="dcomp.private.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Windows.UI.Core.Private.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

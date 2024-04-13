@@ -63,15 +63,6 @@ void WinComp::TryRedirectForManipulation(PointerPoint pp)
 	m_interactionSource.TryRedirectForManipulation(pp);
 }
 
-void WinComp::TryRedirectForManipulation(POINTER_INFO info)
-{
-	namespace abi = ABI::Windows::UI::Composition::Interactions;
-
-	//Redirecting the Pointer input for manipulation by the InteractionTracker
-	com_ptr<abi::IVisualInteractionSourceInterop> sourceInterop = m_interactionSource2.as<abi::IVisualInteractionSourceInterop>();
-	sourceInterop->TryRedirectForManipulation(info);
-}
-
 void WinComp::TryUpdatePositionBy(float3 const& amount)
 {
 	m_tracker.TryUpdatePositionBy(amount);
@@ -129,6 +120,49 @@ void WinComp::PrepareVisuals(HANDLE handle)
 	redirectVisual.Children().InsertAtTop(this->redirectVisual);
 
 	visualTarget->SetRoot(reinterpret_cast<ABI::Windows::UI::Composition::IVisual*>(winrt::get_abi(redirectVisual)));
+
+	Windows::System::Threading::WorkItemHandler workItemHandler([this, redirectVisual](Windows::Foundation::IAsyncAction const&)
+	{
+		CoreIndependentInputSource source{ nullptr };
+		CoreIndependentInputSourceController controller{ nullptr };
+
+		if (Windows::Foundation::Metadata::ApiInformation::IsTypePresent(winrt::name_of<CoreIndependentInputSourceController>()))
+		{
+			controller = CoreIndependentInputSourceController::CreateForVisual(redirectVisual);
+			controller.SetControlledInput(CoreInputDeviceTypes::Touch | CoreInputDeviceTypes::Pen);
+			source = controller.Source();
+		}
+		else
+		{
+			HMODULE winui = GetModuleHandle(L"Windows.UI.dll");
+			if (!winui) winui = LoadLibrary(L"Windows.UI.dll");
+
+			if (winui)
+			{
+				auto CreateCoreInput = (decltype(&PrivateCreateCoreInput))GetProcAddress(winui, MAKEINTRESOURCEA(0x640));
+
+				if (CreateCoreInput)
+				{
+					auto result = CreateCoreInput(CI_INDEPENDENT_INPUT, (COREINPUT_POINTER_TYPE)(CIPT_TOUCH | CIPT_PEN), CIF_NONE, winrt::guid_of<ICoreInputSourceBase>(), winrt::put_abi(source));
+
+					if (SUCCEEDED(result))
+					{
+						auto sourceInterop = source.try_as<ICoreInputInterop>();
+						if (sourceInterop)
+							sourceInterop->SetInputSource((::IUnknown*)winrt::get_abi(redirectVisual));
+					}
+				}
+			}
+		}
+
+		if (source)
+		{
+			source.PointerPressed({ this, &WinComp::OnRedirectVisualPointerPressed });
+			source.Dispatcher().ProcessEvents(Windows::UI::Core::CoreProcessEventsOption::ProcessUntilQuit);
+		}
+	});
+
+	Windows::System::Threading::ThreadPool::RunAsync(workItemHandler, Windows::System::Threading::WorkItemPriority::High, Windows::System::Threading::WorkItemOptions::TimeSliced);
 }
 
 //
@@ -181,6 +215,12 @@ Size WinComp::GetWindowSize()
 	RECT windowRect;
 	::GetWindowRect(m_window, &windowRect);
 	return Size({ (float)(windowRect.right - windowRect.left), (float)(windowRect.bottom - windowRect.top) });
+}
+
+void WinComp::OnRedirectVisualPointerPressed(IInspectable const& sender, PointerEventArgs const& args)
+{
+	//Redirecting the Pointer input for manipulation by the InteractionTracker
+	m_interactionSource2.TryRedirectForManipulation(args.CurrentPoint());
 }
 
 //
